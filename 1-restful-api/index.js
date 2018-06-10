@@ -23,6 +23,7 @@ Note: In a real production program, you should use DB rather than JSON files
 const http = require('http');
 const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
+const config = require('./config');
 
 // Initialize server object
 let server = http.createServer((req, res) => {
@@ -71,8 +72,9 @@ let server = http.createServer((req, res) => {
 // Start the server on port 3000
 // You can test this server by running:
 //   curl localhost:3000
-server.listen(3000, () => {
-    console.log('Server listening on port 3000');
+server.listen(config.port, () => {
+    console.log(`Server running on environment "${config.envName}"`);
+    console.log(`Server listening on port ${config.port}`);
 })
 
 // Handlers
