@@ -10,13 +10,15 @@ let environments = {};
 // Staging (default) environment
 environments.staging = {
     envName: 'staging',
-    port: 3000,
+    httpPort: 3000,
+    httpsPort: 3001
 };
 
 // Production environment
 environments.production = {
     envName: 'production',
-    port: 5000
+    httpPort: 5000,
+    httpsPort: 5001
 };
 
 // Export exvironment

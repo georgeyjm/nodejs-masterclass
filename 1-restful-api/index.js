@@ -19,14 +19,21 @@ Note: In a real production program, you should use DB rather than JSON files
 */
 
 
+
 // Dependencies
 const http = require('http');
+const https = require('https');
 const url = require('url');
+const fs = require('fs');
 const StringDecoder = require('string_decoder').StringDecoder;
 const config = require('./config');
 
-// Initialize server object
-let server = http.createServer((req, res) => {
+
+
+console.log(`Environment: ${config.envName}`);
+
+// General handler for all requests
+let requestHandler = (req, res) => {
 
     // Get and parse request
     let parsedUrl = url.parse(req.url, true);
@@ -67,17 +74,31 @@ let server = http.createServer((req, res) => {
 
         console.log(`${method}/ "${trimmedPath}" with payload: `, buffer);
     });
-});
+}
 
-// Start the server on port 3000
-// You can test this server by running:
-//   curl localhost:3000
-server.listen(config.port, () => {
-    console.log(`Server running on environment "${config.envName}"`);
-    console.log(`Server listening on port ${config.port}`);
+// Instantiate HTTP server
+let httpServer = http.createServer(requestHandler);
+
+// Start HTTP server
+httpServer.listen(config.httpPort, () => {
+    console.log(`HTTP Server listening on port ${config.httpPort}`);
 })
 
-// Handlers
+// Instantiate HTTPS server
+let httpsServerOptions = {
+    key: fs.readFileSync('./ssl/key.pem'),
+    cert: fs.readFileSync('./ssl/cert.pem')
+};
+let httpsServer = https.createServer(httpsServerOptions, requestHandler);
+
+// Start HTTPS server
+httpsServer.listen(config.httpsPort, () => {
+    console.log(`HTTPS Server listening on port ${config.httpsPort}`);
+})
+
+
+
+// Specific path handlers
 let handlers = {};
 
 handlers.test = (data, callback) => {
@@ -87,7 +108,6 @@ handlers.test = (data, callback) => {
 handlers.notFound = (data, callback) => {
     callback(404);
 };
-
 
 // Router
 let router = {
